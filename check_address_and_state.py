@@ -1,14 +1,31 @@
 from dataclasses import dataclass
 import os
 from pathlib import Path
-from tkinter.font import families
-from openpyxl import load_workbook
-from datetime import datetime 
-from typing import Dict, Optional
+from openpyxl import load_workbook, Workbook
+from openpyxl.utils import get_column_letter
+from datetime import datetime
+from typing import List, Optional
 from progressbar import ProgressBar
 
 from gb2_local.api.promed import Task
 from gb2_local.db.mysql import get_vgb2db
+
+
+def write_data_to_excel(data: dict, print_colums: List[str], output_file_path: Path) -> None:
+    """Пишет переданные данные в файл excel по указанному пути."""
+    wb = Workbook()
+    ws = wb.active
+
+    # Пишем заголовок
+    for i, column_name in enumerate(print_colums, start=1):
+        ws[f'{get_column_letter(i)}1'] = column_name
+
+    # Пишем тело таблицы
+    for i, row in enumerate(data, start=2):
+        for j, column_name in enumerate(print_colums, start=1):
+            ws[f'{get_column_letter(j)}{i}'] = row[column_name]
+
+    wb.save(str(output_file_path))
 
 
 @dataclass
@@ -180,4 +197,7 @@ if __name__ == "__main__":
     task = AdditionalDataGetter()
     task.load_data_from_excel(fname)
     task.start()
-    a = task.get_prepared_data()
+    result = task.get_prepared_data()
+
+    # просто вывод в эксель
+    write_data_to_excel(result, ['FAM', 'IM', 'OT', 'DR', 'address_of_registration', 'address_of_live', 'state'], Path(os.getcwd()) / 'assets' / 'new.xlsx')
