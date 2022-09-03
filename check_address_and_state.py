@@ -143,7 +143,7 @@ class AdditionalDataGetter(Task):
         return state
 
     def get_person_data(self, api, people_data: PersonData) -> dict:
-        """Возвращает адрес(-а) и контактные данные в частности телефон."""
+        """Возвращает адрес(-а) и контактные данные, в частности телефон."""
         # получаем данные по персоналке
         response = api.get_request_data(self.GET_PERSON_DATA, {
             "PersonSurName_SurName": people_data.fam,
@@ -169,7 +169,7 @@ class AdditionalDataGetter(Task):
                 'adr_reg': registration_address.get('address_full', ''),
                 'adr_live': live_address.get('address_full', ''),
                 'state': state or '',
-								'phone': phone,
+                'phone': phone,
             }
         return {}
 
