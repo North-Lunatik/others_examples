@@ -143,7 +143,7 @@ class AdditionalDataGetter(Task):
         return state
 
     def get_person_data(self, api, people_data: PersonData) -> dict:
-        """Возвращает адрес(-а) и контактные данные."""
+        """Возвращает адрес(-а) и контактные данные, в частности телефон."""
         # получаем данные по персоналке
         response = api.get_request_data(self.GET_PERSON_DATA, {
             "PersonSurName_SurName": people_data.fam,
@@ -159,6 +159,7 @@ class AdditionalDataGetter(Task):
             adr_reg_id = data.get("UAddress_id")
             adr_live_id = data.get("PAddress_id")
             ppl_id = data.get("Person_id")
+            phone = data.get("PersonPhone_Phone")
 
             registration_address = self.get_address(api, ppl_id, adr_reg_id)
             live_address = self.get_address(api, ppl_id, adr_live_id)
@@ -168,6 +169,7 @@ class AdditionalDataGetter(Task):
                 'adr_reg': registration_address.get('address_full', ''),
                 'adr_live': live_address.get('address_full', ''),
                 'state': state or '',
+                'phone': phone,
             }
         return {}
 
@@ -188,6 +190,7 @@ class AdditionalDataGetter(Task):
             data['address_of_registration'] = person_data.get('adr_reg', '')
             data['address_of_live'] = person_data.get('adr_live', '')
             data['state'] = person_data.get('state', '')
+            data['phone'] = person_data.get('phone', '')
             bar.update(i)
         bar.finish()
 
@@ -200,4 +203,4 @@ if __name__ == "__main__":
     result = task.get_prepared_data()
 
     # просто вывод в эксель
-    write_data_to_excel(result, ['FAM', 'IM', 'OT', 'DR', 'address_of_registration', 'address_of_live', 'state'], Path(os.getcwd()) / 'assets' / 'new.xlsx')
+    write_data_to_excel(result, ['FAM', 'IM', 'OT', 'DR', 'address_of_registration', 'address_of_live', 'state', 'phone'], Path(os.getcwd()) / 'assets' / 'new.xlsx')
